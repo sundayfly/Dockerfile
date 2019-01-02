@@ -92,7 +92,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 		--add-module=./../nginx-upload-module-2.2 \
 	&& make -j$(getconf _NPROCESSORS_ONLN) \
 	&& make install \
-  && strip /usr/sbin/nginx* \
+	&& strip /usr/sbin/nginx* \
 	&& mkdir /etc/nginx/conf.d/ \
 	&& touch /usr/local/nginx/html/favicon.ico \
 	&& rm -rf /usr/local/src/ \
