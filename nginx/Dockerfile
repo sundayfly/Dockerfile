@@ -29,12 +29,12 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 	\
 	&& mkdir -p /usr/local/src \
 	&& cd /usr/local/src \
-	&& wget http://package.xwx.cn/nginx/nginx-$NGINX_VERSION.tar.gz \
-	&& wget http://package.xwx.cn/nginx/nginx_module/echo-nginx-module-master.zip \
-	&& wget http://package.xwx.cn/nginx/nginx_module/headers-more-nginx-module-master.zip \
-	&& wget http://package.xwx.cn/nginx/nginx_module/nginx_upstream_check_module-master.zip \
-	&& wget http://package.xwx.cn/nginx/nginx_module/nginx-upload-module-2.2.zip \
-	&& wget http://package.xwx.cn/nginx/nginx_module/ngx_cache_purge-2.3.tar.gz \
+	&& wget http://package.sundayle.com/nginx/nginx-$NGINX_VERSION.tar.gz \
+	&& wget http://package.sundayle.com/nginx/nginx_module/echo-nginx-module-master.zip \
+	&& wget http://package.sundayle.com/nginx/nginx_module/headers-more-nginx-module-master.zip \
+	&& wget http://package.sundayle.com/nginx/nginx_module/nginx_upstream_check_module-master.zip \
+	&& wget http://package.sundayle.com/nginx/nginx_module/nginx-upload-module-2.2.zip \
+	&& wget http://package.sundayle.com/nginx/nginx_module/ngx_cache_purge-2.3.tar.gz \
 	\
 	&& unzip echo-nginx-module-master.zip \
 	&& unzip headers-more-nginx-module-master.zip \
