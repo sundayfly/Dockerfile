@@ -1,0 +1,90 @@
+FROM php:8.3.6-fpm-bullseye
+
+ENV TZ=Asia/Shanghai
+
+# define timezone
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
+    && echo '$TZ' > /etc/timezone \
+    && sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list \
+    && sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
+
+# export lang
+RUN apt-get update \
+    && apt-get install -y locales \
+    && rm -rf /var/lib/apt/lists/* \
+    && sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen \
+    && dpkg-reconfigure --frontend=noninteractive locales \
+    && update-locale LANG=en_US.UTF-8
+
+# install dependencies
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+		wget \
+        procps \
+        iputils-ping \
+        libmcrypt-dev \
+        libpng-dev \
+        libjpeg62-turbo-dev \
+		libfreetype6-dev  \
+        libwebp-dev \
+        curl \
+        libcurl4 \
+        libcurl4-openssl-dev \
+        zlib1g-dev \
+        unzip \ 
+        libzip-dev \
+        zip \
+        vim \
+		libsodium-dev \
+		libssl-dev \
+        libxml2-dev \
+        libmagickwand-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# configure, install and enable packages
+  RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+    && docker-php-ext-install -j$(nproc) \
+		gd \
+        opcache \
+        mysqli \
+        pdo_mysql \
+        #mcrypt \
+        zip \
+        #json \
+        xml \
+        fileinfo \
+        exif \
+        intl \
+        bcmath \
+        soap \
+        sockets \
+        gettext \
+        #xmlrpc \
+        pcntl \
+        #shmop \
+        #sysvsem \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && ln -s /usr/local/etc/php /etc/php
+    
+# php 8.3 https://github.com/Imagick/imagick/issues/643#issuecomment-1834361716
+  RUN curl -L -o /tmp/imagick.tar.gz https://github.com/Imagick/imagick/archive/7088edc353f53c4bc644573a79cdcd67a726ae16.tar.gz \
+    && tar --strip-components=1 -xf /tmp/imagick.tar.gz \
+    && phpize \
+    && ./configure \
+    && make \
+    && make install \
+    && echo "extension=imagick.so" > /usr/local/etc/php/conf.d/ext-imagick.ini \
+    && rm -rf /tmp/*
+
+# configure opcache
+RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.enable_cli=1" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.memory_consumption=128" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.interned_strings_buffer=8" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.max_accelerated_files=10000" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.validate_timestamps=1" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.revalidate_freq=2" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.save_comments=1" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.file_cache=/tmp" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.huge_code_pages=1" >> /usr/local/etc/php/conf.d/opcache.ini
